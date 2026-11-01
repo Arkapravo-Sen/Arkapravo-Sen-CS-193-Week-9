@@ -1,4 +1,4 @@
-# Project Name
+# Terminal Based Chess Playing Program
 
 A two-player terminal chess game built in Java to provide a lightweight, local strategy game experience that runs instantly in any command-line environment.
 
