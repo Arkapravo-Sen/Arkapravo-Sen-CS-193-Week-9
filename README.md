@@ -25,6 +25,7 @@ git clone [https://github.com/Arkapravo-Sen/Arkapravo-Sen-CS-193-Week-9.git](htt
 cd Arkapravo-Sen-CS-193-Week-9
 javac src/Main.java
 java src.Main
+```
 
 ## Usage
 
