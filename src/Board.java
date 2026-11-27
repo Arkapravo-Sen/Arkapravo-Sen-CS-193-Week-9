@@ -170,8 +170,7 @@ public class Board {
         piece.setPosition(targetRow, targetCol);
 
         // Test if king is in check
-        int[] currentPlayerKingPos = findKing(currentPlayer);
-        boolean kingIsInCheck = isSquareUnderAttack(currentPlayerKingPos[0], currentPlayerKingPos[1], currentPlayer);
+        boolean kingIsInCheck = isKingInCheck(currentPlayer);
 
         // Revert the state of the board to before
         grid[targetRow][targetCol] = capturedPiece; // Put back any captured piece (or null)
@@ -227,5 +226,59 @@ public class Board {
             }
         }
         return false;
+    }
+
+    // Used to see if the king is in check based on color
+    public boolean isKingInCheck(String color) {
+        int[] kingPos = findKing(color);
+        if (kingPos == null) return false;
+        return isSquareUnderAttack(kingPos[0], kingPos[1], color);
+    }
+
+    public boolean hasAnyLegalMoves(String color) {
+        for (int startRow = 0; startRow < 8; startRow++) {
+            for (int startCol = 0; startCol < 8; startCol++) {
+                Piece piece = grid[startRow][startCol];
+                
+                // Find every piece belonging to this player
+                if (piece != null && piece.getColor().equals(color)) {
+                    // Test every possible destination square on the board
+                    for (int targetRow = 0; targetRow < 8; targetRow++) {
+                        for (int targetCol = 0; targetCol < 8; targetCol++) {
+                            if (isLegalMove(startRow, startCol, targetRow, targetCol)) {
+                                // Simulate the move
+                                Piece capturedPiece = grid[targetRow][targetCol];
+                                grid[startRow][startCol] = null;
+                                grid[targetRow][targetCol] = piece;
+                                piece.setPosition(targetRow, targetCol);
+
+                                boolean stillInCheck = isKingInCheck(color);
+
+                                // Revert the move
+                                grid[targetRow][targetCol] = capturedPiece;
+                                grid[startRow][startCol] = piece;
+                                piece.setPosition(startRow, startCol);
+
+                                // Found at least one valid escape!
+                                if (!stillInCheck) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false; // No legal moves exist
+    }
+
+    // Checkmate condition, in check and no legal moves
+    public boolean isCheckmate(String color) {
+        return isKingInCheck(color) && !hasAnyLegalMoves(color);
+    }
+
+    // Stalemate condition, no legal moves, not in check
+    public boolean isStalemate(String color) {
+        return !isKingInCheck(color) && !hasAnyLegalMoves(color);
     }
 }

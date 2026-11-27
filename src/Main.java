@@ -17,7 +17,9 @@ public class Main {
             board.printBoard();
             
             String currentPlayer = isWhiteTurn ? "W" : "B";
-            System.out.println("\nTurn: " + currentPlayer);
+            String playerName = isWhiteTurn ? "White (W)" : "Black (B)";
+            
+            System.out.println("\nTurn: " + playerName);
             System.out.print("Enter your move: ");
             
             String input = scanner.nextLine();
@@ -32,8 +34,28 @@ public class Main {
             boolean success = board.makeMove(input, currentPlayer);
             
             if (success) {
-                // Switch turns if the move was valid
+                // 1. Switch turns
                 isWhiteTurn = !isWhiteTurn;
+                String nextPlayer = isWhiteTurn ? "W" : "B";
+                String nextPlayerName = isWhiteTurn ? "White" : "Black";
+                
+                // 2. Check the status of the player whose turn is next
+                if (board.isCheckmate(nextPlayer)) {
+                    board.printBoard();
+                    String winner = isWhiteTurn ? "Black" : "White";
+                    System.out.println("\n=================================");
+                    System.out.println("   CHECKMATE! " + winner + " wins!   ");
+                    System.out.println("=================================");
+                    gameRunning = false;
+                } else if (board.isStalemate(nextPlayer)) {
+                    board.printBoard();
+                    System.out.println("\n=================================");
+                    System.out.println("   STALEMATE! Game is a draw.    ");
+                    System.out.println("=================================");
+                    gameRunning = false;
+                } else if (board.isKingInCheck(nextPlayer)) {
+                    System.out.println("\n>> WARNING: " + nextPlayerName + " is in CHECK!");
+                }
             } else {
                 System.out.println(">> Move failed. Please try again.");
             }
