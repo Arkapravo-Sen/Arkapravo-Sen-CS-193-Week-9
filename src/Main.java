@@ -16,7 +16,7 @@ public class Main {
         while (gameRunning) {
             board.printBoard();
             
-            String currentPlayer = isWhiteTurn ? "White (W)" : "Black (b)";
+            String currentPlayer = isWhiteTurn ? "W" : "B";
             System.out.println("\nTurn: " + currentPlayer);
             System.out.print("Enter your move: ");
             
@@ -29,7 +29,7 @@ public class Main {
             }
             
             // Execute the move
-            boolean success = board.makeMove(input);
+            boolean success = board.makeMove(input, currentPlayer);
             
             if (success) {
                 // Switch turns if the move was valid

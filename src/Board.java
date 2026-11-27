@@ -128,7 +128,7 @@ public class Board {
     }
 
     // Takes a string input (like "e2 e4"), validates it, and executes the move
-    public boolean makeMove(String moveInput) {
+    public boolean makeMove(String moveInput, String currentPlayer) {
         // Clean up input format (removes all beginning, trailing, and in-between whitespaces)
         moveInput = moveInput.trim().replaceAll("\\s+", "");
         if (moveInput.length() != 4) {
@@ -155,13 +155,77 @@ public class Board {
             System.out.println("Illegal move! Try again.");
             return false;
         }
-        
-        // Execute the move: Update piece position and move it on the grid
+
+        // ----------------------------------------
+        // See if move leaves / moves king in check
+        // ----------------------------------------
+
+        // Save current state of board
         Piece piece = grid[startRow][startCol];
+        Piece capturedPiece = grid[targetRow][targetCol]; // if there is a captured piece save it. could be null also
+
+        // Make the move temporarily on the grid
+        grid[startRow][startCol] = null;
+        grid[targetRow][targetCol] = piece;
+        piece.setPosition(targetRow, targetCol);
+
+        // Test if king is in check
+        int[] currentPlayerKingPos = findKing(currentPlayer);
+        boolean kingIsInCheck = isSquareUnderAttack(currentPlayerKingPos[0], currentPlayerKingPos[1], currentPlayer);
+
+        // Revert the state of the board to before
+        grid[targetRow][targetCol] = capturedPiece; // Put back any captured piece (or null)
+        grid[startRow][startCol] = piece;           // Put the moving piece back
+        piece.setPosition(startRow, startCol);      // Restore piece's internal coordinates
+
+        // If the king was in check return false otherwise move on
+        if (kingIsInCheck) {
+            System.out.println("Illegal move! Leaves or puts your king in check.");
+            return false;
+        }
+
+        // Execute the move: Update piece position and move it on the grid
+        piece = grid[startRow][startCol];
         piece.setPosition(targetRow, targetCol);
         grid[targetRow][targetCol] = piece;
         grid[startRow][startCol] = null;
         
         return true;
+    }
+
+    // The following blocks will be used to see if a king is in check
+
+    // Find position of a king based on piece color
+    public int[] findKing(String color) {
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece p = grid[r][c];
+                if (p instanceof King && p.getColor().equals(color)) {
+                    return new int[] { r, c };
+                }
+            }
+        }
+        return null; // Should never happen in a normal game!
+    }
+
+    // Can an enemy piece attack a certain square? (Used to find checks)
+    public boolean isSquareUnderAttack(int targetRow, int targetCol, String defendingColor) {
+        String attackingColor = defendingColor.equals("W") ? "B" : "W";
+        
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece p = grid[r][c];
+                // If we find an enemy piece, check if it can legally attack the target square
+                if (p != null && p.getColor().equals(attackingColor)) {
+                    // Note: We use raw isValidMove/isPathClear here, bypassing standard turn checks
+                    if (p.isValidMove(targetRow, targetCol, grid)) {
+                        if (p instanceof Knight || isPathClear(r, c, targetRow, targetCol)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
