@@ -6,8 +6,12 @@ public class Knight extends Piece {
 
     @Override
     public boolean isValidMove(int targetRow, int targetCol, Piece[][] board) {
-        // Rook moves horizontally or vertically
-        return this.row == targetRow || this.col == targetCol;
+        // Rook moves L shape
+        int rowDiff = Math.abs(targetRow - this.row);
+        int colDiff = Math.abs(targetCol - this.col);
+
+        // Valid L shape
+        return (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
     }
 
     @Override

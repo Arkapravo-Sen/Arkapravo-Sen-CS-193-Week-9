@@ -6,8 +6,11 @@ public class Bishop extends Piece {
 
     @Override
     public boolean isValidMove(int targetRow, int targetCol, Piece[][] board) {
-        // Rook moves horizontally or vertically
-        return this.row == targetRow || this.col == targetCol;
+        // Bishop moves diagonally so row diff and col diff must be equal
+        int rowDiff = Math.abs(targetRow - this.row);
+        int colDiff = Math.abs(targetCol - this.col);
+
+        return (rowDiff == colDiff) && (rowDiff > 0);
     }
 
     @Override

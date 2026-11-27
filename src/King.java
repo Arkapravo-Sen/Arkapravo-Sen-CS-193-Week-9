@@ -6,8 +6,11 @@ public class King extends Piece {
 
     @Override
     public boolean isValidMove(int targetRow, int targetCol, Piece[][] board) {
-        // Rook moves horizontally or vertically
-        return this.row == targetRow || this.col == targetCol;
+        // King moves horizontally vertically diagonally one square max
+        int rowDiff = Math.abs(targetRow - this.row);
+        int colDiff = Math.abs(targetCol - this.col);
+
+        return (rowDiff <= 1 && colDiff <= 1) && (rowDiff > 0 || colDiff > 0);
     }
 
     @Override

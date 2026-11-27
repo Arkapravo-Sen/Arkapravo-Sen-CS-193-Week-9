@@ -34,7 +34,7 @@ public class Board {
         grid[7][7] = new Rook("W", 7, 7);
         
         for (int i = 0; i < 8; i++) {
-            grid[6][i] = new Pawn("B", 6, i);
+            grid[6][i] = new Pawn("W", 6, i);
         }
     }
 
@@ -57,5 +57,55 @@ public class Board {
         }
         
         System.out.println("    a   b   c   d   e   f   g   h");
+    }
+
+    public boolean isPathClear(int startRow, int startCol, int targetRow, int targetCol) {
+        int rowStep = Integer.compare(targetRow, startRow);
+        int colStep = Integer.compare(targetCol, startCol);
+
+        int currRow = startRow + rowStep;
+        int currCol = startCol + colStep;
+
+        // If the path has a piece return false
+        while (currRow != targetRow || currCol != targetCol) {
+            if (grid[currRow][currCol] != null) {
+                return false;
+            }
+            currRow += rowStep;
+            currCol += colStep;
+        }
+
+        return true;
+    }
+
+    public boolean isLegalMove(int startRow, int startCol, int targetRow, int targetCol) {
+        // Checks if within bounds
+        if (targetRow < 0 || targetRow > 7 || targetCol < 0 || targetCol > 7) {
+            return false;
+        }
+    
+        Piece piece = grid[startRow][startCol];
+        if (piece == null) return false;
+
+        Piece targetPiece = grid[targetRow][targetCol];
+        
+        // No friendly fire
+        if (targetPiece != null && targetPiece.getColor().equals(piece.getColor())) {
+            return false;
+        }
+
+        // Check validity of moves
+        if (!(piece.isValidMove(targetRow, targetCol, grid))) {
+            return false;
+        }
+
+        // Check path for everything but the knight
+        if (!(piece instanceof Knight)) {
+            if (!(isPathClear(startRow, startCol, targetRow, targetCol))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

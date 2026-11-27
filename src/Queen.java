@@ -6,8 +6,11 @@ public class Queen extends Piece {
 
     @Override
     public boolean isValidMove(int targetRow, int targetCol, Piece[][] board) {
-        // Rook moves horizontally or vertically
-        return this.row == targetRow || this.col == targetCol;
+        // Queen moves horizontally and vertically so Rook + Bishop = Queen
+        int rowDiff = Math.abs(targetRow - this.row);
+        int colDiff = Math.abs(targetCol - this.col);
+
+        return ((rowDiff > 0 && colDiff == 0) || (colDiff > 0 && rowDiff == 0)) || ((rowDiff == colDiff) && (rowDiff > 0));
     }
 
     @Override
