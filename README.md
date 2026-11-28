@@ -48,11 +48,16 @@ Compile the Java source files:
 ```bash
 javac src/*.java
 ```
+Navigate into /src
+
+```bash
+cd src/
+```
 
 Run the game:
 
 ```bash
-java src.Main
+java Main.java
 ```
 
 ## Usage
