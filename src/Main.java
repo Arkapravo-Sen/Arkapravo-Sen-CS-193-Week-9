@@ -1,6 +1,18 @@
 import java.util.Scanner;
 
+/**
+ * Entry point for the two-player terminal Chess application.
+ * Manages the main interactive game loop, turn alternation, user input,
+ * and end-game state announcements (checkmate, stalemate, or exit).
+ */
 public class Main {
+
+    /**
+     * Initializes the chessboard and runs the interactive console loop until
+     * checkmate, stalemate, or user exit.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         Board board = new Board();
         Scanner scanner = new Scanner(System.in);
@@ -30,11 +42,11 @@ public class Main {
                 break;
             }
             
-            // Execute the move
+            // Execute the move on the board
             boolean success = board.makeMove(input, currentPlayer);
             
             if (success) {
-                // 1. Switch turns
+                // 1. Switch turns to the next player
                 isWhiteTurn = !isWhiteTurn;
                 String nextPlayer = isWhiteTurn ? "W" : "B";
                 String nextPlayerName = isWhiteTurn ? "White" : "Black";

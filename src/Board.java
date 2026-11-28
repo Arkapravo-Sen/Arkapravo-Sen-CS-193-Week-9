@@ -1,14 +1,23 @@
 import java.util.Scanner;
 
+/**
+ * Represents an 8x8 chessboard and manages game state, move validation,
+ * coordinate parsing, pawn promotion, and check/checkmate/stalemate detection.
+ */
 public class Board {
     private Piece[][] grid;
 
+    /**
+     * Constructs a new Board and initializes all pieces to their standard starting positions.
+     */
     public Board() {
         grid = new Piece[8][8];
         setupInitialDisplay();
     }
 
-    // Fills the grid with placeholder symbols for an initial visual test
+    /**
+     * Populates the 8x8 grid with Black and White pieces in standard starting formation.
+     */
     public void setupInitialDisplay() {
 
         // Black Pieces
@@ -40,7 +49,9 @@ public class Board {
         }
     }
 
-    // Prints the 8x8 grid with file (a-h) and rank (1-8) labels
+    /**
+     * Renders the current state of the 8x8 board to the console with rank (1-8) and file (a-h) labels.
+     */
     public void printBoard() {
         System.out.println("    a   b   c   d   e   f   g   h");
         System.out.println("  ---------------------------------");
@@ -61,6 +72,15 @@ public class Board {
         System.out.println("    a   b   c   d   e   f   g   h");
     }
 
+    /**
+     * Verifies that all squares strictly between the start and target coordinates are empty.
+     *
+     * @param startRow  Starting row index (0-7).
+     * @param startCol  Starting column index (0-7).
+     * @param targetRow Destination row index (0-7).
+     * @param targetCol Destination column index (0-7).
+     * @return {@code true} if the path is unobstructed; {@code false} otherwise.
+     */
     public boolean isPathClear(int startRow, int startCol, int targetRow, int targetCol) {
         int rowStep = Integer.compare(targetRow, startRow);
         int colStep = Integer.compare(targetCol, startCol);
@@ -80,6 +100,16 @@ public class Board {
         return true;
     }
 
+    /**
+     * Validates whether a move obeys board bounds, friendly-fire restrictions,
+     * piece movement geometry, and path obstruction rules.
+     *
+     * @param startRow  Starting row index (0-7).
+     * @param startCol  Starting column index (0-7).
+     * @param targetRow Destination row index (0-7).
+     * @param targetCol Destination column index (0-7).
+     * @return {@code true} if the move is geometrically and structurally legal; {@code false} otherwise.
+     */
     public boolean isLegalMove(int startRow, int startCol, int targetRow, int targetCol) {
         // Checks if within bounds
         if (targetRow < 0 || targetRow > 7 || targetCol < 0 || targetCol > 7) {
@@ -111,7 +141,12 @@ public class Board {
         return true;
     }
 
-    // Parses chess notation like "e2" into array indices [row, col].
+    /**
+     * Converts standard algebraic chess notation (e.g., "e2") into 2D grid indices [row, col].
+     *
+     * @param coord Two-character coordinate string (file 'a'-'h', rank '1'-'8').
+     * @return A two-element integer array {@code [row, col]}, or {@code null} if invalid.
+     */
     public int[] parseCoordinate(String coord) {
         if (coord == null || coord.length() != 2) return null;
         
@@ -129,7 +164,14 @@ public class Board {
         return new int[] { row, col };
     }
 
-    // Takes a string input (like "e2 e4"), validates it, and executes the move
+    /**
+     * Takes a string input (like "e2 e4"), validates it, ensures the move does not leave
+     * or put the player's King in check, and executes the move.
+     *
+     * @param moveInput     User input string (e.g., "e2 e4").
+     * @param currentPlayer Color code of the active player ("W" or "B").
+     * @return {@code true} if the move was valid and executed successfully; {@code false} otherwise.
+     */
     public boolean makeMove(String moveInput, String currentPlayer) {
         // Clean up input format (removes all beginning, trailing, and in-between whitespaces)
         moveInput = moveInput.trim().replaceAll("\\s+", "");
@@ -204,7 +246,12 @@ public class Board {
 
     // The following blocks will be used to see if a king is in check
 
-    // Find position of a king based on piece color
+    /**
+     * Finds and returns the grid coordinates of the King matching the specified color.
+     *
+     * @param color Color code of the King ("W" or "B").
+     * @return A two-element integer array {@code [row, col]}, or {@code null} if not found.
+     */
     public int[] findKing(String color) {
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
@@ -217,7 +264,14 @@ public class Board {
         return null; // Should never happen in a normal game!
     }
 
-    // Can an enemy piece attack a certain square? (Used to find checks)
+    /**
+     * Determines whether an enemy piece can legally attack a specific board square.
+     *
+     * @param targetRow      Row index of the square.
+     * @param targetCol      Column index of the square.
+     * @param defendingColor Color code of the defending player ("W" or "B").
+     * @return {@code true} if the square is under attack; {@code false} otherwise.
+     */
     public boolean isSquareUnderAttack(int targetRow, int targetCol, String defendingColor) {
         String attackingColor = defendingColor.equals("W") ? "B" : "W";
         
@@ -238,13 +292,24 @@ public class Board {
         return false;
     }
 
-    // Used to see if the king is in check based on color
+    /**
+     * Evaluates whether the specified player's King is currently in check.
+     *
+     * @param color Color code of the player ("W" or "B").
+     * @return {@code true} if the King is in check; {@code false} otherwise.
+     */
     public boolean isKingInCheck(String color) {
         int[] kingPos = findKing(color);
         if (kingPos == null) return false;
         return isSquareUnderAttack(kingPos[0], kingPos[1], color);
     }
 
+    /**
+     * Scans all friendly pieces to see if any piece has at least one legal move that escapes check.
+     *
+     * @param color Color code of the player ("W" or "B").
+     * @return {@code true} if at least one legal move exists; {@code false} otherwise.
+     */
     public boolean hasAnyLegalMoves(String color) {
         for (int startRow = 0; startRow < 8; startRow++) {
             for (int startCol = 0; startCol < 8; startCol++) {
@@ -282,17 +347,34 @@ public class Board {
         return false; // No legal moves exist
     }
 
-    // Checkmate condition, in check and no legal moves
+    /**
+     * Determines whether the specified player is in checkmate (in check with zero legal moves).
+     *
+     * @param color Color code of the player ("W" or "B").
+     * @return {@code true} if checkmate has occurred; {@code false} otherwise.
+     */
     public boolean isCheckmate(String color) {
         return isKingInCheck(color) && !hasAnyLegalMoves(color);
     }
 
-    // Stalemate condition, no legal moves, not in check
+    /**
+     * Determines whether the specified player is in stalemate (not in check, with zero legal moves).
+     *
+     * @param color Color code of the player ("W" or "B").
+     * @return {@code true} if stalemate has occurred; {@code false} otherwise.
+     */
     public boolean isStalemate(String color) {
         return !isKingInCheck(color) && !hasAnyLegalMoves(color);
     }
 
-    // Method for pawn promotion
+    /**
+     * Prompts the player to promote a pawn that has reached the opposite back rank into a
+     * Queen, Rook, Bishop, or Knight.
+     *
+     * @param row   Row index of the promoted pawn.
+     * @param col   Column index of the promoted pawn.
+     * @param color Color code of the pawn ("W" or "B").
+     */
     public void promotePawn(int row, int col, String color) {
         Scanner scanner = new Scanner(System.in);
         Piece promotedPiece = null;
