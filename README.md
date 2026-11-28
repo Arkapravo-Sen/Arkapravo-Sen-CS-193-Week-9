@@ -39,9 +39,9 @@ java src.Main
 
 ## Roadmap
 
-[ ] Advanced rules: Castling, En Passant, and Pawn Promotion
-[ ] Single-player mode against a basic AI opponent
-[ ] Save/Load game state using a local text file
+[] Advanced rules: Castling, En Passant, and Pawn Promotion
+[] Single-player mode against a basic AI opponent
+[] Save/Load game state using a local text file
 
 ## Author
 

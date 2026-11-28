@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class Board {
     private Piece[][] grid;
 
@@ -188,6 +190,14 @@ public class Board {
         piece.setPosition(targetRow, targetCol);
         grid[targetRow][targetCol] = piece;
         grid[startRow][startCol] = null;
+
+        // Check for Pawn Promotion
+        if (piece instanceof Pawn) {
+            if ((piece.getColor().equals("W") && targetRow == 0) ||
+                (piece.getColor().equals("B") && targetRow == 7)) {
+                promotePawn(targetRow, targetCol, piece.getColor());
+            }
+        }
         
         return true;
     }
@@ -280,5 +290,37 @@ public class Board {
     // Stalemate condition, no legal moves, not in check
     public boolean isStalemate(String color) {
         return !isKingInCheck(color) && !hasAnyLegalMoves(color);
+    }
+
+    // Method for pawn promotion
+    public void promotePawn(int row, int col, String color) {
+        Scanner scanner = new Scanner(System.in);
+        Piece promotedPiece = null;
+
+        while (promotedPiece == null) {
+            System.out.print("Pawn promotion! Choose (Q)ueen, (R)ook, (B)ishop, or (K)night: ");
+            String choice = scanner.nextLine().trim().toUpperCase();
+
+            switch (choice) {
+                case "Q":
+                    promotedPiece = new Queen(color, row, col);
+                    break;
+                case "R":
+                    promotedPiece = new Rook(color, row, col);
+                    break;
+                case "B":
+                    promotedPiece = new Bishop(color, row, col);
+                    break;
+                case "K":
+                    promotedPiece = new Knight(color, row, col);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please enter Q, R, B, or K.");
+            }
+        }
+
+        grid[row][col] = promotedPiece;
+        System.out.println("Pawn promoted to " + promotedPiece.getSymbol() + "!");
+        scanner.close();
     }
 }
